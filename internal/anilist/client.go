@@ -116,7 +116,6 @@ query ($season: MediaSeason!, $seasonYear: Int!, $page: Int!, $perPage: Int!) {
       nextAiringEpisode {
         episode
         airingAt
-        timeUntilAiring
       }
 			coverImage {
 				extraLarge
@@ -132,9 +131,8 @@ func (c *Client) SearchSeasonAnime(ctx context.Context, season MediaSeason, seas
 	var perPage int = 50
 	var pageIx int = 1
 	var media []Media
-	var pageInfo PageInfo
 	var firstRun bool = true
-
+	var hasNextPage = true
 	for {
 		req := Request{
 			Query: searchSeasonAnimeQuery,
@@ -155,17 +153,13 @@ func (c *Client) SearchSeasonAnime(ctx context.Context, season MediaSeason, seas
 		}
 		if firstRun {
 			media = data.Page.Media
-			pageInfo = data.Page.PageInfo
+			hasNextPage = data.Page.PageInfo.HasNextPage
 			firstRun = false
 		} else {
 			media = append(media, data.Page.Media...)
-			pageInfo.CurrentPage = data.Page.PageInfo.CurrentPage
-			pageInfo.HasNextPage = data.Page.PageInfo.HasNextPage
-			pageInfo.LastPage = data.Page.PageInfo.LastPage
-			pageInfo.Total += data.Page.PageInfo.Total
-			pageInfo.PerPage = data.Page.PageInfo.PerPage
+			hasNextPage = data.Page.PageInfo.HasNextPage
 		}
-		if !pageInfo.HasNextPage {
+		if hasNextPage {
 			break
 		}
 		pageIx++
@@ -186,7 +180,6 @@ query ($id: Int!) {
       nodes {
         episode
         airingAt
-        timeUntilAiring
       }
     }
   }
@@ -243,7 +236,6 @@ query ($season: MediaSeason!, $seasonYear: Int!, $page: Int!, $perPage: Int!) {
       nextAiringEpisode {
         episode
         airingAt
-        timeUntilAiring
       }
 			coverImage {
 				extraLarge
@@ -255,7 +247,6 @@ query ($season: MediaSeason!, $seasonYear: Int!, $page: Int!, $perPage: Int!) {
 					airingAt
 					episode
 					id
-					timeUntilAiring
 				}
 			}
     }

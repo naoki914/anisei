@@ -1,5 +1,10 @@
 package anilist
 
+import (
+	"strings"
+	"time"
+)
+
 type MediaSeason string
 
 const (
@@ -8,6 +13,44 @@ const (
 	SeasonSummer MediaSeason = "SUMMER"
 	SeasonFall   MediaSeason = "FALL"
 )
+
+func GetCurrentSeason() MediaSeason {
+	var season MediaSeason
+	m := time.Now().Month()
+
+	switch m {
+	case 0, 1, 2:
+		season = SeasonWinter
+	case 3, 4, 5:
+		season = SeasonSpring
+	case 6, 7, 8:
+		season = SeasonSummer
+	case 9, 10, 11:
+		season = SeasonFall
+	default:
+		season = SeasonWinter
+	}
+	return season
+}
+
+func GetSeasonFromString(s string) MediaSeason {
+	var season MediaSeason
+
+	switch strings.ToUpper(s) {
+	case string(SeasonWinter):
+		season = SeasonWinter
+	case string(SeasonSpring):
+		season = SeasonSpring
+	case string(SeasonSummer):
+		season = SeasonSummer
+	case string(SeasonFall):
+		season = SeasonFall
+	default:
+		season = GetCurrentSeason()
+	}
+
+	return season
+}
 
 // Title represents anime title translations
 type Title struct {
@@ -18,9 +61,8 @@ type Title struct {
 
 // NextAiringEpisode represents upcoming episode info
 type NextAiringEpisode struct {
-	Episode         int   `json:"episode,omitempty"`
-	AiringAt        int64 `json:"airingAt,omitempty"`
-	TimeUntilAiring int   `json:"timeUntilAiring,omitempty"`
+	Episode  int   `json:"episode,omitempty"`
+	AiringAt int64 `json:"airingAt,omitempty"`
 }
 
 // Media represents an anime/media item from the API
@@ -61,9 +103,8 @@ type Response[T any] struct {
 }
 
 type AiringSchedule struct {
-	Episode   int   `json:"episode"`
-	AiringAt  int64 `json:"airingAt"`
-	TimeUntil int   `json:"timeUntilAiring"`
+	Episode  int   `json:"episode"`
+	AiringAt int64 `json:"airingAt"`
 }
 
 type CoverImage struct {
